@@ -1,10 +1,9 @@
 package com.bk.service;
 
-import com.bk.entity.Role;
-import com.bk.entity.User;
+import com.bk.entity.AuthLogEntity;
+import com.bk.entity.MetricEntity;
 import com.bk.repo.AuthLogRepository;
-import com.bk.repo.RoleRepository;
-import com.bk.repo.UserRepository;
+import com.bk.repo.MetricRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,24 +18,26 @@ public class UserServiceImpl implements UserService {
     @Autowired
     private AuthLogRepository authLogRepository;
     @Autowired
-    private UserRepository userRepository;
+    private MetricRepository metricRepository;
     @Autowired
-    private RoleRepository roleRepository;
-
+    private ExternalApiService externalApiService;
 
     @Override
-    public void syncUser() {
-        List<User> users = new ArrayList<>();
-        List<Integer> userIds = authLogRepository.findDistinctUserIds();
-        Role userRole = roleRepository.findById(3L).get();
-        for (Integer userId : userIds) {
-            User user = new User();
-            user.setId(Long.valueOf(userId));
-            user.setUsername("username_" + userId);
-            user.setPassword("password_" + userId);
-            user.setRole(userRole);
-            users.add(user);
+    public void detectAbnormal() {
+        var allAuthLogs = authLogRepository.findAll();
+        List<MetricEntity> metricEntities = new ArrayList<>();
+        for (AuthLogEntity e : allAuthLogs) {
+            long start = System.currentTimeMillis();
+            var metric = new MetricEntity();
+            metric.setUserId(e.getUserId());
+            metric.setAnomaly(e.getAnomaly());
+            var predictData = externalApiService.callCheckLoginDetect(e);
+            metric.setPredict(predictData.getPrediction());
+            long end = System.currentTimeMillis();
+            metric.setTook(end - start);
+            metric.setModel(predictData.getModel());
+            metricEntities.add(metric);
         }
-        userRepository.saveAll(users);
+        metricRepository.saveAll(metricEntities);
     }
 }

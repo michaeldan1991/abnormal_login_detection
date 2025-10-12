@@ -6,6 +6,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,5 +32,7 @@ public class AuthLogEntity {
     private int failedAttempts;
     private double behavioralScore;
     private int anomaly;
+    @CreationTimestamp
+    private LocalDateTime createDate;
 
 }
