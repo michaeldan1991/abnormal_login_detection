@@ -37,7 +37,7 @@ public class PublicController {
 
     @PostMapping("/trigger")
     public String trigger() {
-        userService.detectAbnormal();
+        userService.detectAbnormalParallel();
         return "ok";
     }
 

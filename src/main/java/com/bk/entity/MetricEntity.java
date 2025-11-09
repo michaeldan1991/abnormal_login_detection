@@ -22,6 +22,7 @@ public class MetricEntity {
     private Long id;
 
     private int userId;
+    private int type;
     private int anomaly;
     private int predict;
     private long took;
