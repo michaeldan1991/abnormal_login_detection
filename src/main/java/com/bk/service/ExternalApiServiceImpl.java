@@ -29,7 +29,7 @@ public class ExternalApiServiceImpl implements ExternalApiService {
     @Override
     public PredictionData callCheckLoginDetect(AuthLogEntity entity) {
         try {
-            String url = "http://localhost:5000/predict";
+            String url = "http://localhost:5000/fraud/predict";
             List<Object> features = List.of(
                     entity.getUserId(),
                     entity.getTimestamp(),
